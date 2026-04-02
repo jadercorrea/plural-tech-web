@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plural Tech | Engineering Autonomous Workflows</title>
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,500,700,900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-base: #020202;
+            --bg-panel: rgba(15, 15, 15, 0.4);
+            --bg-card: rgba(22, 22, 22, 0.4);
+            --brand-main: #FE6902;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A1A1AA;
+            --border: rgba(255,255,255,0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased;}
+
+        body {
+            font-family: 'Satoshi', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated Mesh Gradient Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: 
+                radial-gradient(circle at 40% 40%, rgba(254, 105, 2, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 70% 30%, rgba(200, 50, 0, 0.05) 0%, transparent 30%);
+            z-index: -1;
+            animation: meshFloat 25s infinite linear alternate;
+        }
+
+        @keyframes meshFloat {
+            0% { transform: rotate(0deg) scale(1); }
+            100% { transform: rotate(20deg) scale(1.1); }
+        }
+
+        .container {
+            max-width: 680px;
+            text-align: center;
+            padding: 60px 40px;
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo-box {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 32px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: var(--brand-main);
+            box-shadow: 0 0 40px rgba(254, 105, 2, 0.15), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            margin-bottom: 16px;
+            background: linear-gradient(to right, #FFF, #AAA);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            font-size: 19px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 50px;
+            font-weight: 500;
+        }
+
+        .products-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            text-align: left;
+        }
+
+        .product-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            padding: 30px;
+            border-radius: 20px;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at top left, rgba(255,255,255,0.05), transparent 60%);
+            opacity: 0; transition: 0.4s; pointer-events: none;
+        }
+
+        .product-card:hover {
+            border-color: rgba(254, 105, 2, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(254, 105, 2, 0.1);
+        }
+
+        .product-card:hover::before { opacity: 1; }
+
+        .pt-title {
+            font-size: 19px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .pt-title i { 
+            color: var(--brand-main); 
+            background: linear-gradient(135deg, rgba(254, 105, 2, 0.15), rgba(254, 105, 2, 0.02));
+            border: 1px solid rgba(254, 105, 2, 0.2);
+            box-shadow: inset 0 0 15px rgba(254, 105, 2, 0.08), 0 4px 10px rgba(0,0,0,0.2);
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+        
+        .pt-status { 
+            font-size: 11px; 
+            font-weight: 800; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #22c55e;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            padding: 6px 12px;
+            border-radius: 100px;
+        }
+
+        .footer {
+            margin-top: 80px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-box">
+            <img src="assets/logo.png" alt="Plural Tech Logo" style="width: 100%; height: 100%; border-radius: 20px; object-fit: cover;">
+        </div>
+        <h1>Plural Tech.</h1>
+        <p class="subtitle">Engineering autonomous workflows and premium Micro-SaaS tools for high-performance teams.</p>
+        
+        <div class="products-grid">
+            <a href="prompt-machine/index.html" class="product-card">
+                <div class="pt-title"><i class="fas fa-bolt"></i> Instant Sales Machine</div>
+                <div class="pt-status">Active</div>
+            </a>
+            
+            <a href="hub/index.html" class="product-card">
+                <div class="pt-title"><i class="fas fa-layer-group"></i> Plural Hub (A.I Directory)</div>
+                <div class="pt-status">Active</div>
+            </a>
+
+            <a href="mailto:jader@zapfy.com.br?subject=Application:%20Executive%20Advisory" class="product-card">
+                <div class="pt-title"><i class="fas fa-chess-knight" style="color: #FFF; background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.02)); border: 1px solid rgba(255,255,255,0.2); box-shadow: inset 0 0 15px rgba(255,255,255,0.05), 0 4px 10px rgba(0,0,0,0.2);"></i> Executive Advisory</div>
+                <div class="pt-status" style="color: #E4E4E7; background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1);">Application Only</div>
+            </a>
+        </div>
+
+        <div class="footer">
+            &copy; 2026 Plural Tech Software. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaP: Máquina Instantânea de Vendas (Plural Tech)</title>
+    <link rel="icon" href="../assets/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="../../design-system/components/badges.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
+
+    <!-- Google Tag Manager / Analytics (Placeholder) -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-XXXXXXX');</script>
+    <!-- End Google Tag Manager -->
+
+    <!-- Meta Pixel Code (Placeholder) -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', 'XXXXXXXXXXXXXXXX');
+    fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=XXXXXXXXXXXXXXXX&ev=PageView&noscript=1"/></noscript>
+    <!-- End Meta Pixel Code -->
+
+    <style>
+        :root {
+            --bg-base: #020202;
+            --bg-panel: rgba(15, 15, 15, 0.4);
+            --bg-card: rgba(22, 22, 22, 0.4);
+            --border: rgba(255, 255, 255, 0.05);
+            --border-glow: rgba(254, 105, 2, 0.4);
+            
+            --brand-main: #FE6902;
+            --brand-glow: #FE3C02;
+            
+            --text-primary: #FFFFFF;
+            --text-secondary: #A1A1AA;
+            --text-tertiary: #6B7280;
+
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            outline: none;
+            -webkit-font-smoothing: antialiased;
+            font-family: 'Satoshi', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated Mesh Gradient Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: 
+                radial-gradient(circle at 50% 50%, rgba(254, 105, 2, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 20%, rgba(200, 50, 0, 0.03) 0%, transparent 30%);
+            z-index: -1;
+            animation: meshFloat 30s infinite linear;
+        }
+
+        @keyframes meshFloat {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Auth Gate Premium */
+        #authOverlay {
+            position: fixed; inset: 0; background: rgba(3, 3, 3, 0.98);
+            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); z-index: 2000;
+            display: flex; align-items: center; justify-content: center; text-align: center;
+        }
+        #authOverlay.hidden { display: none; }
+        .auth-box {
+            position: relative;
+            background: linear-gradient(180deg, rgba(20,20,20,0.8), rgba(10,10,10,0.9));
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 32px; padding: 50px 40px; max-width: 480px; width: 90%;
+            box-shadow: 0 40px 100px -20px rgba(254,105,2,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .auth-box::before {
+            content: ''; position: absolute; top: -1px; left: 10%; right: 10%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--brand-main), transparent); opacity: 0.5;
+        }
+        .lock-icon {
+            width: 80px; height: 80px; margin: 0 auto 24px; border-radius: 50%;
+            background: rgba(254,105,2,0.1); border: 1px solid rgba(254,105,2,0.2);
+            display: flex; align-items: center; justify-content: center; font-size: 32px; color: var(--brand-main);
+            animation: pulseGlow 3s infinite alternate;
+        }
+        @keyframes pulseGlow { from { box-shadow: 0 0 20px rgba(254,105,2,0.1); } to { box-shadow: 0 0 50px rgba(254,105,2,0.4); } }
+        .auth-box h2 { font-size: 28px; font-weight: 900; letter-spacing: -1px; margin-bottom: 12px; }
+        .auth-box .sub { color: var(--text-secondary); font-size: 15px; margin-bottom: 24px; line-height: 1.6; }
+        .info-box { background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.1); border-radius: 16px; padding: 16px; margin-bottom: 24px; font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .auth-box input {
+            width: 100%; padding: 18px; margin-bottom: 16px; background: rgba(0,0,0,0.5);
+            border: 1px solid var(--border); border-radius: 12px; color: var(--brand-main); text-align: center;
+            letter-spacing: 3px; font-weight: 800; font-size: 14px; outline: none; transition: 0.3s;
+        }
+        .auth-box input:focus { border-color: var(--brand-main); box-shadow: 0 0 0 3px rgba(254,105,2,0.1); }
+        .auth-box button {
+            width: 100%; padding: 18px; background: linear-gradient(135deg, var(--brand-main), var(--brand-glow)); border: none;
+            border-radius: 12px; color: white; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(254,105,2,0.2);
+        }
+        .auth-box button:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(254,105,2,0.3); }
+
+        /* -----------------------
+           LAYOUT
+        ----------------------- */
+        .app-container {
+            width: 100%;
+            max-width: 1440px;
+            padding: 40px;
+            height: clamp(800px, 90vh, 1080px);
+            display: grid;
+            grid-template-columns: 460px 1fr;
+            gap: 40px;
+            display: none;
+        }
+
+        .app-container.ready {
+            display: grid;
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 1100px) {
+            .app-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+        }
+
+        /* -----------------------
+           LEFT PANEL (FORM)
+        ----------------------- */
+        .sidebar {
+            background: var(--bg-panel);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 40px 100px -20px rgba(0,0,0,0.8),
+                        inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, transparent, var(--brand-main), transparent);
+            opacity: 0.5;
+        }
+
+        .brand-header {
+            margin-bottom: 40px;
+        }
+
+        .brand-header h1 {
+            font-size: 28px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: -1px;
+        }
+
+        .brand-header h1 i {
+            color: var(--brand-main);
+            font-size: 24px;
+            filter: drop-shadow(0 0 12px rgba(254, 105, 2, 0.4));
+        }
+
+        .brand-header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-group label i {
+            color: var(--brand-main);
+            opacity: 0.8;
+            font-size: 14px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            border-radius: var(--radius-sm);
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--border-glow);
+            box-shadow: 0 0 0 3px rgba(254, 105, 2, 0.1),
+                        inset 0 1px 0 rgba(255,255,255,0.05);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .input-wrapper input,
+        .input-wrapper textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 15px;
+            padding: 16px;
+        }
+
+        .input-wrapper input::placeholder,
+        .input-wrapper textarea::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .input-wrapper textarea {
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.6;
+        }
+
+        .btn-generate {
+            margin-top: auto;
+            width: 100%;
+            padding: 20px;
+            border-radius: var(--radius-md);
+            border: none;
+            background: linear-gradient(135deg, var(--brand-main), var(--brand-glow));
+            color: white;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 12px 30px rgba(254, 105, 2, 0.25),
+                        inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(254, 105, 2, 0.35),
+                        inset 0 1px 0 rgba(255,255,255,0.3);
+        }
+
+        .btn-generate::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: skewX(-20deg);
+            transition: 0.5s;
+        }
+        
+        .btn-generate:hover::after {
+            left: 150%;
+        }
+
+        /* -----------------------
+           RIGHT PANEL (RESULTS)
+        ----------------------- */
+        .main-viewport {
+            border-radius: var(--radius-lg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .results-container {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 16px;
+            scroll-behavior: smooth;
+        }
+
+        .results-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .results-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .results-container::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+        .results-container::-webkit-scrollbar-thumb:hover {
+            background: var(--text-tertiary);
+        }
+
+        /* Empty State */
+        .empty-state {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--text-tertiary);
+            padding: 40px;
+            background: var(--bg-panel);
+            border-radius: var(--radius-lg);
+            border: 1px dashed var(--border);
+        }
+
+        .empty-state .icon-wrapper {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.02);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin-bottom: 24px;
+            box-shadow: inset 0 0 0 1px var(--border);
+            position: relative;
+        }
+        
+        .empty-state .icon-wrapper::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 1px dashed rgba(255,255,255,0.1);
+            animation: spin 20s linear infinite;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .empty-state h2 {
+            color: var(--text-primary);
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            max-width: 400px;
+            line-height: 1.6;
+        }
+
+        /* Loader */
+        .loader-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(3, 3, 3, 0.8);
+            backdrop-filter: blur(12px);
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            border-radius: var(--radius-lg);
+        }
+
+        .loader-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .pulse-ring {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-top-color: var(--brand-main);
+            border-bottom-color: var(--brand-glow);
+            animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+            margin-bottom: 24px;
+        }
+
+        .loader-text {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #fff, #888);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulseText 2s infinite;
+        }
+
+        @keyframes pulseText {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Prompts List Grid */
+        .prompt-list {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            padding-bottom: 40px;
+        }
+
+        /* The Premium Prompt Card */
+        .prompt-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            transform: translateY(30px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .prompt-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .prompt-card:hover {
+            border-color: rgba(255,255,255,0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+        }
+
+        /* Glowing energetic line atop the card */
+        .prompt-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--brand-main), transparent);
+            opacity: 0.2;
+            transition: opacity 0.3s;
+        }
+        
+        .prompt-card:hover::before {
+            opacity: 1;
+        }
+
+        .prompt-header {
+            padding: 24px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .prompt-title-area {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .prompt-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .prompt-title i {
+            color: var(--brand-main);
+            background: rgba(254, 105, 2, 0.1);
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .prompt-badge {
+            align-self: flex-start;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 4px 10px;
+            border-radius: var(--radius-xl);
+        }
+
+        .btn-copy {
+            background: var(--text-primary);
+            color: var(--bg-base);
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(255,255,255,0.1);
+        }
+
+        .btn-copy:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(255,255,255,0.2);
+        }
+
+        .btn-copy.copied {
+            background: #22c55e;
+            color: white;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+        
+        /* -----------------------
+           GROWTH UPSELL BANNER
+        ----------------------- */
+        .growth-banner {
+            margin-top: 32px;
+            padding: 24px;
+            background: linear-gradient(135deg, rgba(254, 105, 2, 0.1), rgba(18, 18, 18, 0.6));
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .growth-banner::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 150px; height: 150px;
+            background: radial-gradient(circle, rgba(254, 105, 2, 0.2) 0%, transparent 70%);
+            transform: translate(50%, -50%);
+        }
+
+        .growth-banner-content h4 {
+            font-size: 18px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            font-weight: 800;
+        }
+
+        .growth-banner-content p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            max-width: 400px;
+        }
+
+        .growth-banner-content strong {
+            color: var(--brand-main);
+        }
+
+        .btn-growth {
+            background: var(--text-primary);
+            color: var(--bg-base);
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 14px;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            z-index: 2;
+        }
+
+        .btn-growth:hover {
+            transform: scale(1.05);
+            background: var(--brand-main);
+            color: white;
+            box-shadow: 0 10px 20px rgba(254, 105, 2, 0.3);
+        }
+
+        .prompt-body {
+            padding: 30px 24px;
+            font-size: 16px;
+            line-height: 1.8;
+            color: #d1d5db;
+            white-space: pre-wrap;
+            position: relative;
+            background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, transparent 100%);
+            border-radius: 0 0 var(--radius-md) var(--radius-md);
+        }
+
+        /* Subtle quote mark watermark inside body */
+        .prompt-body::after {
+            content: '❝';
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 80px;
+            color: rgba(255,255,255,0.02);
+            pointer-events: none;
+            font-family: serif;
+        }
+
+        /* -----------------------
+           TOAST NOTIFICATION
+        ----------------------- */
+        .toast {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(18, 18, 18, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 16px 32px;
+            border-radius: var(--radius-xl);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5),
+                        0 0 0 1px rgba(255,255,255,0.05) inset;
+            z-index: 1000;
+        }
+        
+        .toast i {
+            color: #22c55e;
+            font-size: 20px;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* -----------------------
+           AUTH OVERLAY 
+        ----------------------- */
+        #authOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(3, 3, 3, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease;
+        }
+        
+        #authOverlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .auth-box {
+            background: var(--bg-panel);
+            border: 1px solid rgba(254, 105, 2, 0.3);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.05);
+            text-align: center;
+            position: relative;
+        }
+
+        .auth-box h2 {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .auth-box p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .auth-box .input-wrapper {
+            margin-bottom: 20px;
+        }
+
+        .auth-box .input-wrapper input {
+            text-align: center;
+            letter-spacing: 2px;
+            font-weight: 700;
+            color: var(--brand-main);
+            text-transform: uppercase;
+        }
+        
+        .auth-box .info-box {
+            background: rgba(255,255,255,0.03);
+            padding: 15px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .auth-box input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius-sm);
+            color: white;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .auth-box button {
+            width: 100%;
+            padding: 12px;
+            background: var(--brand-main);
+            border: none;
+            border-radius: var(--radius-sm);
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="authOverlay">
+        <div class="auth-box">
+            <div class="lock-icon"><i class="fas fa-fingerprint"></i></div>
+            <h2 id="authTitle">Acesso Restrito</h2>
+            <p class="sub" id="authSub">O desbloqueio acontece automaticamente via <strong>Redirecionamento Inteligente</strong> após a compra.</p>
+            <div class="info-box">
+                <i class="fas fa-shield-alt" style="color:var(--brand-main); font-size:16px;"></i><br>
+                <span id="authInfo">Se você limpou o cache e perdeu o acesso, insira sua <strong>Chave VIP</strong> (ID da Transação do Stripe) que consta no recibo por e-mail.</span>
+            </div>
+            <form id="vaultForm">
+                <input type="text" id="authKey" placeholder="cs_live_XXXX..." required autocomplete="off">
+                <button type="submit" id="btnSubmit">Validar Conexão</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <div class="app-container" id="app">
+        
+        <!-- Sidebar Setup -->
+        <aside class="sidebar">
+            <div class="brand-header">
+                <h1 style="display:flex; align-items:center;">
+                    <img src="../assets/logo.png" alt="Logo" style="width: 48px; height: 48px; border-radius: 12px; border: 1px solid rgba(254, 105, 2, 0.2); margin-right: 16px; object-fit: cover; box-shadow: 0 0 20px rgba(254, 105, 2, 0.2);">
+                    <span data-i18n="t_title">Motor Tático</span>
+                </h1>
+                <p data-i18n="t_subtitle">O cérebro estratégico do seu negócio. Preencha os parâmetros para sintetizar seus prompts instantaneamente.</p>
+            </div>
+
+            <div class="scrollable-form" style="flex:1; overflow-y:auto; padding-right:10px; margin-bottom:20px;">
+                <div class="input-group">
+                    <label for="inputNiche"><i class="fas fa-bullseye"></i> <span data-i18n="l_niche">Seu Segmento de Atuação</span></label>
+                    <div class="input-wrapper">
+                        <input type="text" id="inputNiche" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="inputProduct"><i class="fas fa-box-open"></i> <span data-i18n="l_product">Solução / Produto</span></label>
+                    <div class="input-wrapper">
+                        <input type="text" id="inputProduct" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="inputAudience"><i class="fas fa-users"></i> <span data-i18n="l_audience">Cliente Ideal (Persona)</span></label>
+                    <div class="input-wrapper">
+                        <input type="text" id="inputAudience" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="inputOffer"><i class="fas fa-tag"></i> <span data-i18n="l_offer">A Oferta ou Diferencial</span></label>
+                    <div class="input-wrapper">
+                        <input type="text" id="inputOffer" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="inputBenefit"><i class="fas fa-rocket"></i> <span data-i18n="l_benefit">Grande Transformação</span></label>
+                    <div class="input-wrapper">
+                        <textarea id="inputBenefit"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-generate" onclick="generateEngine()">
+                <i class="fas fa-stopwatch"></i> <span data-i18n="b_process">Processar Estratégia</span>
+            </button>
+        </aside>
+
+        <!-- Main Viewport -->
+        <main class="main-viewport">
+            
+            <div class="loader-overlay" id="loaderOverlay">
+                <div class="pulse-ring"></div>
+                <div class="loader-text" id="loaderText">SINTETIZANDO LINGUAGEM...</div>
+            </div>
+
+            <div class="results-container" id="resultsContainer">
+                <!-- Empty State -->
+                <div class="empty-state" id="emptyState">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h2 data-i18n="e_title">Aguardando Setup</h2>
+                    <p data-i18n="e_desc">Insira as diretrizes do seu negócio no menu lateral. O algoritmo fará o cruzamento com nossa biblioteca principal de Mega-Prompts corporativos.</p>
+                </div>
+
+                <!-- Dynamic Results List -->
+                <div class="prompt-list" id="promptList" style="display:none;">
+                    <!-- Cards will be injected here -->
+                </div>
+
+                <!-- Growth Upsell Banner (Hidden until generation) -->
+                <div class="growth-banner" id="growthBanner" style="display:none; flex-wrap: wrap;">
+                    <div class="growth-banner-content" style="flex: 1 1 300px;">
+                        <h4><i class="fas fa-rocket" style="color:var(--brand-main)"></i> <span data-i18n="g_title">Zapfy Growth (Em Breve)</span></h4>
+                        <p data-i18n="g_desc">Evolua da etapa manual para a automação total. Entre para a lista VIP e receba acesso antecipado (convite exclusivo) à nova plataforma.</p>
+                    </div>
+                    <form onsubmit="captureGrowthLead(event)" style="display:flex; gap:8px; align-items:stretch; z-index:2; flex: 1 1 200px;">
+                        <input type="email" id="growthLeadEmail" required style="flex:1; min-width:0; padding:12px; border-radius:var(--radius-sm); border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.5); color:white; font-family:inherit; outline:none;">
+                        <button type="submit" class="btn-growth" id="btnGrowthSubmit" style="border:none; cursor:pointer;">
+                            <span data-i18n="g_btn">Garantir Convite</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+        </main>
+    </div>
+
+    <div class="toast" id="toastCopy">
+        <i class="fas fa-check-circle"></i> <span id="toastCopyText">Pipeline Copiado</span>
+    </div>
+
+    <!-- Core Engine + i18n -->
+    <script>
+        const locales = {
+            pt: {
+                ui: {
+                    t_title: "Motor Tático",
+                    t_subtitle: "O cérebro estratégico do seu negócio. Preencha os parâmetros para sintetizar seus prompts instantaneamente.",
+                    l_niche: "Seu Segmento de Atuação", p_niche: "Ex: Imobiliária, SaaS B2B...",
+                    l_product: "Solução / Produto", p_product: "Ex: Mentoria de Negócios, CRM...",
+                    l_audience: "Cliente Ideal (Persona)", p_audience: "Ex: Diretores sem tempo buscando...",
+                    l_offer: "A Oferta ou Diferencial", p_offer: "Ex: Garantia de 30 dias, Frete Grátis...",
+                    l_benefit: "Grande Transformação", p_benefit: "A promessa final. Ex: Dobrar o faturamento em 6 meses...",
+                    b_process: "Processar Estratégia",
+                    e_title: "Aguardando Setup",
+                    e_desc: "Insira as diretrizes do seu negócio no menu lateral. O algoritmo fará o cruzamento com nossa biblioteca principal de Mega-Prompts corporativos.",
+                    g_title: "Zapfy Growth (Em Breve)",
+                    g_desc: "Evolua da etapa manual para a automação total. Entre para a lista VIP e receba acesso antecipado à nova plataforma.",
+                    g_pl: "Seu e-mail corporativo",
+                    g_btn: "Garantir Convite",
+                    v_copied: "Copiado!",
+                    v_copybtn: "Copiar",
+                    v_loading: "Processando...",
+                    v_vip: "Você está na Lista VIP",
+                    v_secured: "Convite garantido! Avisaremos em breve.",
+                    v_toast: "Pipeline Copiado para a Área de Transferência",
+                    loaders: ["CALIBRANDO TONOS DE COPY...", "CONSTRUINDO FRAMEWORKS PAS...", "ESTRUTURANDO GATILHOS MENTAIS...", "GERANDO OUTPUT FINAL..."]
+                },
+                prompts: (niche, product, audience, offer, benefit) => [
+                    {
+                        title: "Máquina de Anúncios (Escala Incomum)", badge: "META ADS • GOOGLE ADS", icon: "fa-bullseye",
+                        content: `Aja como o Top Copywriter de Resposta Direta do Brasil (nível 8-dígitos). Minha empresa atua no nicho de ${niche} e desejo escalar o produto central: ${product}.\n\nCrie 2 Variações de Anúncios (Facebook/IG Ads) focados estritamente em ROAS alto para o público: ${audience}.\n\nDIRETRIZES TÉCNICAS E VIESES COGNITIVOS:\n1. Variável 1 (Abordagem Lógica - Framework PAS): Inicie quebrando o padrão. Apele para a dor latente e apresente a solução ancorada no benefício absoluto de ${benefit}.\n2. Variável 2 (Abordagem Emocional - StoryBrand): Conte uma micro-historia de 3 linhas. Foco no 'Antes vs Depois' emocional.\n\nRESTRIÇÕES DE SAÍDA:\n- Ambos devem culminar na oferta irrecusável: ${offer}.\n- NENHUMA hashtag. Proibido usar linguagem clichê corporativa.\n- Entregue o output em formatação Markdown limpa.`
+                    },
+                    {
+                        title: "Roteiro de Vídeo Algorítmico (Retenção 80%+)", badge: "TIKTOK • REELS", icon: "fa-film",
+                        content: `Aja como um Growth Hacker e Especialista em Algoritmos (TikTok/Reels). Preciso de 1 Roteiro de Vídeo Curto (Até 45s) com foco em viralização direcionada e conversão para o produto: ${product}.\n\nESTRUTURA MATEMÁTICA DE RETENÇÃO:\n1. HOOK (0-3s): Frase de abertura não-ortodoxa ou dissonância cognitiva agressiva envolvendo a ${audience}.\n2. CORPO RÁPIDO (3-25s): Metodologia problema -> alívio, comprovando empiricamente a transformação de ${benefit}.\n3. PONTE DE CONVERSÃO (25-45s): Fechamento sutil mas impossível de ignorar revelando a escassez de: ${offer}.\n\nCrie uma Tabela com 4 colunas:\n| Segundagem | Script falado | Edição (B-Roll) | Texto na Tela |`
+                    },
+                    {
+                        title: "Scripts Anti-Fuga (Vendas WhatsApp)", badge: "CRM • FECHAMENTO", icon: "fa-comments-dollar",
+                        content: `Aja como o Closer Chefe de Vendas High-Ticket do nicho de ${niche}. Sua equipe recebe leads desqualificados e precisa inverter as objeções e fechar a venda do ${product}.\n\nEscreva scripts de WhatsApp exatos (prontos para copiar colar, tom coloquial mas profissional) para as 3 maiores evasivas de compradores da ${audience}:\n\nCENÁRIO A - "Muito Caro": Aplique ancoragem de contraste emocional com a perda de não ter ${benefit}.\nCENÁRIO B - "Vou pensar e te aviso": Force um micro-compromisso temporal usando ${offer} como alavanca.\nCENÁRIO C - Vácuo Pós-Preço:\nMensagem de 15 palavras usando o Miedo de Perder (FOMO).`
+                    },
+                    {
+                        title: "Sequência Matadora (E-mail B2B)", badge: "AQUECIMENTO • E-MAIL", icon: "fa-paper-plane",
+                        content: `Aja como especialista em E-mail Marketing focado em Lançamentos Meteoros. Crie uma Micro-Campanha de 3 E-mails (Sequência Seinfeld) para reaquecer nossa base de ${audience} e ofertar violentamente o ${product}.\n\nE-mail 1 (O Gancho Indireto): Foque totalmente em agitar a dor corporativa do nicho de ${niche} sem vender. Dê 3 opções de assunto alto CTR.\nE-mail 2 (Revelação): Conecte a dor agitada ontem com nosso mecanismo único que entrega ${benefit}.\nE-mail 3 (Último Chamado Hard-Sell): Vá direto ao ponto. Apresente ${offer} e coloque um relógio regressivo mental. CTA triplo no texto.`
+                    }
+                ]
+            },
+            en: {
+                ui: {
+                    t_title: "Tactical Engine",
+                    t_subtitle: "The strategic brain of your business. Fill in the parameters to synthesize your prompts instantly.",
+                    l_niche: "Your Industry / Niche", p_niche: "Ex: Premium Real Estate, B2B SaaS...",
+                    l_product: "Solution / Product", p_product: "Ex: Business Mentorship, CRM Software...",
+                    l_audience: "Ideal Client Persona", p_audience: "Ex: Busy directors looking for...",
+                    l_offer: "The Offer or Advantage", p_offer: "Ex: 30-Day Guarantee, Free Onboarding...",
+                    l_benefit: "Ultimate Transformation", p_benefit: "The main promise that makes them buy. Ex: Double MRR...",
+                    b_process: "Process Strategy",
+                    e_title: "Awaiting Setup",
+                    e_desc: "Enter your business specifics in the sidebar. The algorithm will cross-reference this with our primary library of corporate Mega-Prompts.",
+                    g_title: "Zapfy Growth (Coming Soon)",
+                    g_desc: "Scale from manual tasks to full automation. Join the VIP waitlist for early access to our new platform.",
+                    g_pl: "Your business email",
+                    g_btn: "Secure Invite",
+                    v_copied: "Copied!",
+                    v_copybtn: "Copy",
+                    v_loading: "Processing...",
+                    v_vip: "You are on the VIP List",
+                    v_secured: "Invite secured! We will notify you soon.",
+                    v_toast: "Pipeline Copied to Clipboard",
+                    loaders: ["CALIBRATING COPY TONES...", "BUILDING PAS FRAMEWORKS...", "STRUCTURING MENTAL TRIGGERS...", "GENERATING FINAL OUTPUT..."]
+                },
+                prompts: (niche, product, audience, offer, benefit) => [
+                    {
+                        title: "Ad Machine (Uncommon Scale)", badge: "META ADS • GOOGLE ADS", icon: "fa-bullseye",
+                        content: `Act as a Top-Tier Direct Response Copywriter. My company operates in the ${niche} industry and I want to scale our core product: ${product}.\n\nCreate 2 Ad Variations (Facebook/IG Ads) strictly focused on high ROAS for the audience: ${audience}.\n\nTECHNICAL GUIDELINES & COGNITIVE BIASES:\n1. Variation 1 (Logical Approach - PAS Framework): Start by breaking the pattern. Highlight the latent pain point and present the solution anchored in the absolute benefit of ${benefit}.\n2. Variation 2 (Emotional Approach - StoryBrand): Tell a 3-line micro-story. Focus on the emotional 'Before vs After'.\n\nOUTPUT RESTRAINTS:\n- Both must culminate in the irresistible offer: ${offer}.\n- NO hashtags. Strictly forbidden to use cliché corporate language.\n- Deliver the output in clean Markdown formatting.`
+                    },
+                    {
+                        title: "Algorithmic Video Script (80%+ Retention)", badge: "TIKTOK • REELS", icon: "fa-film",
+                        content: `Act as a Growth Hacker and Short-Video Algorithm Specialist. I need 1 Short Video Script (Up to 45s) focused on targeted virality and conversion for the product: ${product}.\n\nMATHEMATICAL RETENTION STRUCTURE:\n1. HOOK (0-3s): An unorthodox opening phrase or aggressive cognitive dissonance involving the ${audience}.\n2. FAST BODY (3-25s): Problem -> relief methodology, empirically proving the transformation of ${benefit}.\n3. CONVERSION BRIDGE (25-45s): Subtle but impossible-to-ignore closing revealing the scarcity of: ${offer}.\n\nCreate a structured Table with 4 columns:\n| Seconds | Spoken Script | B-Roll (Visual Edit) | Strong On-Screen Text |`
+                    },
+                    {
+                        title: "Anti-Ghosting Scripts (Sales Closings)", badge: "CRM • CLOSING", icon: "fa-comments-dollar",
+                        content: `Act as the Head High-Ticket Closer of the ${niche} industry. Your team receives hesitant leads and needs to invert objections to close the sale of the ${product}.\n\nWrite exact WhatsApp scripts (ready to copy-paste, conversational but professional) for the 3 major evasions from ${audience}:\n\nSCENARIO A - "Too Expensive": Apply contrast anchoring, diluting time cost of not having ${benefit}.\nSCENARIO B - "I'll think about it": Force a temporal micro-commitment anchoring that ${offer} will evaporate.\nSCENARIO C - Post-Pricing Ghost:\nShort message (max 15 words) using the "Fear Of Missing Out (FOMO)" trigger.`
+                    },
+                    {
+                        title: "Killer Email Sequence (Warm-Up)", badge: "WARM-UP • B2B", icon: "fa-paper-plane",
+                        content: `Act as an Email Marketing expert focused on rapid product launches. Create a Micro-Campaign of 3 Emails (Seinfeld Sequence) to re-engage our base of ${audience} and aggressively offer the ${product}.\n\nEmail 1 (The Indirect Hook): Focus entirely on agitating the business pain of the ${niche} niche without selling. Provide 3 highly clickable [SUBJECT] ideas.\nEmail 2 (Epiphany): Connect yesterday's agitated pain with our unique mechanism that delivers ${benefit}. Insert social proof.\nEmail 3 (Last Call Hard-Sell): Go straight to the point. Present ${offer} and set a mental countdown clock. Triple CTA in the text.`
+                    }
+                ]
+            },
+            es: {
+                ui: {
+                    t_title: "Motor Táctico",
+                    t_subtitle: "El cerebro estratégico de tu negocio. Completa los parámetros para sintetizar tus prompts al instante.",
+                    l_niche: "Tu Industria / Nicho", p_niche: "Ej: Bienes Raíces, Desarrollo B2B...",
+                    l_product: "Solución / Producto", p_product: "Ej: Mentoría de Negocios, CRM...",
+                    l_audience: "Cliente Ideal (Persona)", p_audience: "Ej: Directores ocupados buscando...",
+                    l_offer: "La Oferta o Diferencial", p_offer: "Ej: Demo Gratis, Garantía de 30 días...",
+                    l_benefit: "Gran Transformación", p_benefit: "La promesa que los hace comprar. Ej: Duplicar ingresos en 6 meses...",
+                    b_process: "Procesar Estrategia",
+                    e_title: "Esperando Configuración",
+                    e_desc: "Ingresa las especificaciones de tu negocio en el menú lateral. El algoritmo las cruzará con nuestra biblioteca principal de Mega-Prompts corporativos.",
+                    g_title: "Zapfy Growth (Próximamente)",
+                    g_desc: "Evoluciona de la etapa manual a la automatización total. Únete a la lista VIP y obtén acceso anticipado a la nueva plataforma.",
+                    g_pl: "Tu correo corporativo",
+                    g_btn: "Asegurar Invitación",
+                    v_copied: "¡Copiado!",
+                    v_copybtn: "Copiar",
+                    v_loading: "Procesando...",
+                    v_vip: "Estás en la Lista VIP",
+                    v_secured: "¡Invitación asegurada! Te avisaremos pronto.",
+                    v_toast: "Pipeline Copiado al Portapapeles",
+                    loaders: ["CALIBRANDO TONOS DE COPY...", "CONSTRUYENDO FRAMEWORKS PAS...", "ESTRUCTURANDO GATILLOS MENTALES...", "GERANDO OUTPUT FINAL..."]
+                },
+                prompts: (niche, product, audience, offer, benefit) => [
+                    {
+                        title: "Máquina de Anuncios (Escala Inusual)", badge: "META ADS • GOOGLE ADS", icon: "fa-bullseye",
+                        content: `Actúa como un Copywriter de Respuesta Directa Top-Tier. Mi empresa opera en la industria de ${niche} y quiero escalar nuestro producto central: ${product}.\n\nCrea 2 Variaciones de Anuncios (Facebook/IG Ads) estrictamente enfocados en alto ROAS para el público: ${audience}.\n\nDIRECTRICES TÉCNICAS Y SESGOS COGNITIVOS:\n1. Variación 1 (Enfoque Lógico - Framework PAS): Empieza rompiendo el patrón. Resalta el dolor latente y presenta la solución anclada en el beneficio absoluto de ${benefit}.\n2. Variación 2 (Enfoque Emocional - StoryBrand): Cuenta una micro-historia de 3 líneas. Concéntrate en el 'Antes vs Después' emocional.\n\nRESTRICCIONES DE SALIDA:\n- Ambas deben culminar en la oferta irresistible: ${offer}.\n- SIN hashtags. Estrictamente prohibido usar lenguaje corporativo cliché.\n- Entrega la salida en formato Markdown limpio.`
+                    },
+                    {
+                        title: "Guion de Video Algorítmico (Retención 80%+)", badge: "TIKTOK • REELS", icon: "fa-film",
+                        content: `Actúa como un Growth Hacker y Especialista en Algoritmos de Videos Cortos. Necesito 1 Guion de Video Corto (Hasta 45s) enfocado en viralidad y conversión para el producto: ${product}.\n\nESTRUCTURA MATEMÁTICA DE RETENCIÓN:\n1. HOOK (0-3s): Una frase de apertura poco ortodoxa o disonancia cognitiva agresiva que involucre a ${audience}.\n2. CUERPO RÁPIDO (3-25s): Metodología problema -> alivio, comprobando la transformación de ${benefit}.\n3. PUENTE DE CONVERSIÓN (25-45s): Cierre sutil pero imposible de ignorar revelando la escasez de: ${offer}.\n\nCREA UNA TABLA CON 4 COLUMNAS:\n| Segundaje | Qué decir (Guion hablado) | B-Roll (Corte / Edición) | Texto en Pantalla |`
+                    },
+                    {
+                        title: "Guiones Anti-Evasión (Cierre de Ventas)", badge: "CRM • CLOSING", icon: "fa-comments-dollar",
+                        content: `Actúa como el Cerrador Principal (High-Ticket) del nicho de ${niche}. Tu equipo recibe prospectos descalificados y necesita invertir las objeciones para vender el ${product}.\n\nEscribe guiones de WhatsApp exactos (listos para copiar y pegar, tono coloquial profesional) para las 3 mayores evasivas de nuestra audiencia: ${audience}:\n\nESCENARIO A - "Muy Caro": Aplica anclaje de contraste, diluyendo el costo frente a la pérdida de no tener ${benefit}.\nESCENARIO B - "Voy a pensarlo": Fuerza un micro-compromiso anclando que la oferta actual de ${offer} desaparecerá.\nESCENARIO C - Visto (Ghosting):\nMensaje corto (máximo 15 palabras) usando el gatillo del Miedo a Perder (FOMO).`
+                    },
+                    {
+                        title: "Secuencia Asesina de Correos (Warm-Up)", badge: "WARM-UP • B2B", icon: "fa-paper-plane",
+                        content: `Actúa como experto en Email Marketing enfocado en lanzamientos meteoros. Crea una Micro-Campaña de 3 Correos (Secuencia Seinfeld) para reactivar nuestra base de ${audience} y ofertar violentamente el ${product}.\n\nCorreo 1 (El Gancho Indirecto): Concéntrate totalmente en agitar el dolor corporativo del nicho de ${niche} sin vender directo. Proporciona 3 ideas de Asunto con alto CTR.\nCorreo 2 (Epifanía): Conecta el dolor agitado ayer con nuestro mecanismo único que entrega ${benefit}.\nCorreo 3 (Último Llamado Hard-Sell): Ve directo al grano. Presenta ${offer} y pon un reloj de cuenta regresiva mental. Triple CTA en el texto.`
+                    }
+                ]
+            }
+        };
+
+        let currentLang = 'pt';
+        let uiStrings = locales.pt.ui;
+
+        function detectLanguage() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('lang')) {
+                const queryLang = params.get('lang').toLowerCase();
+                if (locales[queryLang]) return queryLang;
+                if (queryLang.startsWith('es')) return 'es';
+                if (queryLang.startsWith('en')) return 'en';
+            }
+            const browserLang = navigator.language.toLowerCase();
+            if (browserLang.startsWith('es')) return 'es';
+            if (browserLang.startsWith('en')) return 'en';
+            return 'pt';
+        }
+
+        function applyTranslations() {
+            uiStrings = locales[currentLang].ui;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(uiStrings[key]) { el.innerText = uiStrings[key]; }
+            });
+            document.getElementById('inputNiche').placeholder = uiStrings.p_niche;
+            document.getElementById('inputProduct').placeholder = uiStrings.p_product;
+            document.getElementById('inputAudience').placeholder = uiStrings.p_audience;
+            document.getElementById('inputOffer').placeholder = uiStrings.p_offer;
+            document.getElementById('inputBenefit').placeholder = uiStrings.p_benefit;
+            document.getElementById('growthLeadEmail').placeholder = uiStrings.g_pl;
+            document.getElementById('toastCopyText').innerText = uiStrings.v_toast;
+            document.documentElement.lang = currentLang === 'pt' ? 'pt-BR' : currentLang;
+
+            if (currentLang === 'en') {
+                document.getElementById('authTitle').textContent = "Restricted Access";
+                document.getElementById('authSub').innerHTML = "Unlocking happens automatically via <strong>Smart Redirect</strong> after purchase.";
+                document.getElementById('authInfo').innerHTML = "If you cleared your cache and lost access, enter your <strong>VIP Key</strong> (Stripe Transaction ID) from your email receipt.";
+                document.getElementById('btnSubmit').textContent = "Validate Connection";
+            } else if (currentLang === 'es') {
+                document.getElementById('authTitle').textContent = "Acceso Restringido";
+                document.getElementById('authSub').innerHTML = "El desbloqueo ocurre automáticamente vía <strong>Redirección Inteligente</strong> después de la compra.";
+                document.getElementById('authInfo').innerHTML = "Si limpiaste tu caché y perdiste acceso, ingresa tu <strong>Clave VIP</strong> (ID de Transacción Stripe) del recibo por email.";
+                document.getElementById('btnSubmit').textContent = "Validar Conexión";
+            }
+        }
+
+        // ==========================================
+        // AUTH GATE LOGIC
+        // ==========================================
+        function validateToken(v) { 
+            const c = v.trim(); 
+            return c.toUpperCase() === 'PLURAL-VIP' || ((c.startsWith('cs_live_') || c.startsWith('cs_test_')) && c.length > 20); 
+        }
+
+        function checkAuth() {
+            const params = new URLSearchParams(window.location.search);
+            const token = params.get('token');
+            if (token && validateToken(token)) {
+                localStorage.setItem('prompt_access', 'ok');
+                params.delete('token');
+                const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+                try { window.history.replaceState({}, '', newUrl); } catch(e) {}
+                revealApp(); return;
+            }
+            if (localStorage.getItem('prompt_access') === 'ok') revealApp();
+        }
+
+        document.getElementById('vaultForm').onsubmit = (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmit');
+            const originalText = btn.textContent;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            setTimeout(() => {
+                if (validateToken(document.getElementById('authKey').value)) {
+                    localStorage.setItem('prompt_access', 'ok');
+                    btn.innerHTML = '<i class="fas fa-check"></i>';
+                    btn.style.background = '#22c55e';
+                    setTimeout(revealApp, 600);
+                } else {
+                    btn.textContent = currentLang === 'en' ? "Invalid Key" : (currentLang === 'es' ? "Clave Inválida" : "Chave Inválida");
+                    btn.style.background = '#ef4444';
+                    setTimeout(() => { btn.textContent = originalText; btn.style.background = ''; }, 2000);
+                }
+            }, 800);
+        };
+
+        if (document.readyState === 'loading') {
+            window.addEventListener('DOMContentLoaded', () => {
+                currentLang = detectLanguage();
+                applyTranslations();
+                checkAuth();
+            });
+        } else {
+            currentLang = detectLanguage();
+            applyTranslations();
+            checkAuth();
+        }
+
+        function revealApp() {
+            document.getElementById('authOverlay').classList.add('hidden');
+            setTimeout(() => { 
+                document.getElementById('app').classList.add('ready'); 
+                document.getElementById('inputNiche').focus();
+            }, 100);
+        }
+
+        // ==========================================
+        // ENGINE LOGIC
+        // ==========================================
+        function generateEngine() {
+            const btn = document.querySelector('.btn-generate');
+            const loader = document.getElementById('loaderOverlay');
+            const textEl = document.getElementById('loaderText');
+            const emptyState = document.getElementById('emptyState');
+            const promptList = document.getElementById('promptList');
+            
+            // Get Values
+            const niche = document.getElementById('inputNiche').value.trim() || '[NICHE]';
+            const product = document.getElementById('inputProduct').value.trim() || '[PRODUCT]';
+            const audience = document.getElementById('inputAudience').value.trim() || '[AUDIENCE]';
+            const offer = document.getElementById('inputOffer').value.trim() || '[OFFER]';
+            const benefit = document.getElementById('inputBenefit').value.trim() || '[BENEFIT]';
+
+            // Start Loading Animation
+            loader.classList.add('active');
+            btn.style.pointerEvents = "none";
+            btn.style.opacity = "0.7";
+
+            const loadersTexts = uiStrings.loaders;
+            textEl.innerText = loadersTexts[0];
+            let step = 0;
+            const textInterval = setInterval(() => {
+                step++;
+                if(step < loadersTexts.length) {
+                    textEl.innerText = loadersTexts[step];
+                }
+            }, 400);
+            
+            setTimeout(() => {
+                clearInterval(textInterval);
+                loader.classList.remove('active');
+                btn.style.pointerEvents = "auto";
+                btn.style.opacity = "1";
+                
+                emptyState.style.display = "none";
+                document.getElementById('growthBanner').style.display = "flex";
+                renderCards(niche, product, audience, offer, benefit);
+            }, 2000); // fake processing timing
+        }
+
+        function renderCards(niche, product, audience, offer, benefit) {
+            const list = document.getElementById('promptList');
+            list.innerHTML = "";
+            list.style.display = "flex";
+
+            // Gets Prompts strictly from the current selected language
+            const payloadDS = locales[currentLang].prompts(niche, product, audience, offer, benefit);
+            
+            const btnText = uiStrings.v_copybtn;
+
+            payloadDS.forEach((p, index) => {
+                const card = document.createElement('div');
+                card.className = "prompt-card";
+                
+                setTimeout(() => { card.classList.add('visible'); }, 50 + (index * 150));
+                
+                card.innerHTML = `
+                    <div class="prompt-header">
+                        <div class="prompt-title-area">
+                            <span class="prompt-badge">${p.badge}</span>
+                            <h4 class="prompt-title">
+                                <i><span class="fas ${p.icon}"></span></i> 
+                                ${p.title}
+                            </h4>
+                        </div>
+                        <button class="btn-copy" onclick="copyAction(this)">
+                            ${btnText} <i class="far fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="prompt-body">${p.content}</div>
+                `;
+                
+                list.appendChild(card);
+            });
+        }
+
+        // ==========================================
+        // COPY & LEAD LOGIC
+        // ==========================================
+        function copyAction(btn) {
+            const body = btn.closest('.prompt-card').querySelector('.prompt-body');
+            const textToCopy = body.innerText;
+
+            const makeSuccessVisual = () => {
+                const prev = btn.innerHTML;
+                btn.innerHTML = `${uiStrings.v_copied} <i class="fas fa-check"></i>`;
+                btn.classList.add('copied');
+                
+                const toast = document.getElementById('toastCopy');
+                toast.classList.add('show');
+
+                setTimeout(() => {
+                    btn.innerHTML = prev;
+                    btn.classList.remove('copied');
+                    toast.classList.remove('show');
+                }, 2500);
+            };
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textToCopy).then(makeSuccessVisual).catch(err => copyFallback(textToCopy, makeSuccessVisual));
+            } else {
+                copyFallback(textToCopy, makeSuccessVisual);
+            }
+        }
+
+        function copyFallback(text, onSuccessCallback) {
+            const temp = document.createElement("textarea");
+            temp.value = text;
+            temp.style.position = "fixed";
+            temp.style.opacity = "0";
+            document.body.appendChild(temp);
+            temp.focus();
+            temp.select();
+            try {
+                document.execCommand("copy");
+                if(onSuccessCallback) onSuccessCallback();
+            } catch (err) { console.error("Fallback Copy Error:", err); }
+            document.body.removeChild(temp);
+        }
+
+        function captureGrowthLead(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnGrowthSubmit');
+            const emailInput = document.getElementById('growthLeadEmail');
+            const email = emailInput.value.trim();
+            if(!email) return;
+
+            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> ${uiStrings.v_loading}`;
+            btn.style.pointerEvents = "none";
+            emailInput.disabled = true;
+
+            setTimeout(() => {
+                btn.innerHTML = `<i class="fas fa-check"></i> ${uiStrings.v_vip}`;
+                btn.style.background = '#22c55e';
+                btn.style.color = 'white';
+                
+                const toast = document.getElementById('toastCopy');
+                document.getElementById('toastCopyText').innerText = uiStrings.v_secured;
+                toast.classList.add('show');
+                
+                setTimeout(() => { 
+                    toast.classList.remove('show');
+                    setTimeout(() => {
+                        document.getElementById('toastCopyText').innerText = uiStrings.v_toast;
+                    }, 500);
+                }, 4000);
+            }, 1200);
+        }
+    </script>
+</body>
+</html>
